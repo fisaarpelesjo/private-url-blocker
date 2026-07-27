@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Private URL Blocker",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Bloqueia URLs e dominios definidos pelo usuario usando storage.sync.",
   "icons": {
     "48": "icon.svg",
@@ -17,8 +17,11 @@
     },
     "gecko_android": {}
   },
-  "permissions": ["storage", "tabs", "webRequest", "webRequestBlocking"],
+  "permissions": ["storage", "activeTab", "webRequest", "webRequestBlocking"],
   "host_permissions": ["<all_urls>"],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+  },
   "background": {
     "scripts": ["background/service-worker.js"]
   },

@@ -1,6 +1,6 @@
 {
   "name": "private-url-blocker",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "engines": {
@@ -8,6 +8,7 @@
   },
   "scripts": {
     "build": "node scripts/build.mjs",
+    "metadata:check": "node scripts/validate-metadata.mjs",
     "mobile": "node scripts/run-android.mjs stable",
     "mobile:beta": "node scripts/run-android.mjs beta",
     "mobile:nightly": "node scripts/run-android.mjs nightly",
@@ -15,7 +16,7 @@
     "source:zip": "node scripts/source-package.mjs",
     "xpi": "npm run build && web-ext build --source-dir dist --artifacts-dir artifacts --overwrite-dest",
     "typecheck": "tsc --noEmit",
-    "test": "npm run build && node dist-tests/rules.test.mjs && node dist-tests/storage.test.mjs"
+    "test": "npm run metadata:check && npm run build && node scripts/build-tests.mjs && node dist-tests/rules.test.mjs && node dist-tests/storage.test.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.1.2",

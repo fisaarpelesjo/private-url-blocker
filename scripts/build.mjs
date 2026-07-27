@@ -4,16 +4,12 @@ import { build } from "esbuild";
 
 const root = process.cwd();
 const dist = join(root, "dist");
-const testDist = join(root, "dist-tests");
 
-await rm(dist, { force: true, recursive: true });
-await rm(testDist, { force: true, recursive: true });
+await removeDirectory(dist);
 await mkdir(dist, { recursive: true });
 await mkdir(join(dist, "background"), { recursive: true });
 await mkdir(join(dist, "popup"), { recursive: true });
 await mkdir(join(dist, "options"), { recursive: true });
-await mkdir(join(dist, "shared"), { recursive: true });
-await mkdir(testDist, { recursive: true });
 
 await Promise.all([
   copyFile(join(root, "public", "manifest.json"), join(dist, "manifest.json")),
@@ -35,18 +31,29 @@ await build({
   format: "iife",
   outdir: dist,
   platform: "browser",
-  sourcemap: true,
   target: ["firefox115"],
   logLevel: "info"
 });
 
-await build({
-  entryPoints: [join(root, "tests", "rules.test.ts"), join(root, "tests", "storage.test.ts")],
-  bundle: true,
-  format: "esm",
-  outdir: testDist,
-  outExtension: { ".js": ".mjs" },
-  platform: "node",
-  target: ["node20"],
-  logLevel: "info"
-});
+async function removeDirectory(path) {
+  const maxAttempts = 5;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      await rm(path, { force: true, recursive: true });
+      return;
+    } catch (error) {
+      if (attempt === maxAttempts || error?.code !== "EPERM") {
+        throw error;
+      }
+
+      await wait(attempt * 150);
+    }
+  }
+}
+
+function wait(milliseconds) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, milliseconds);
+  });
+}

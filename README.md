@@ -156,6 +156,16 @@ The options page supports:
 - restore backup
 - clear list
 
+JSON import accepts either the extension export format or a simple array of rules:
+
+```json
+[
+  "instagram.com",
+  "reddit.com/*",
+  "*.youtube.com"
+]
+```
+
 ## Firefox Android Development
 
 For temporary Android testing:
@@ -197,7 +207,7 @@ npm run xpi
 The package is generated at:
 
 ```text
-artifacts/private_url_blocker-0.1.0.zip
+artifacts/private_url_blocker-0.1.1.zip
 ```
 
 Because this project uses TypeScript and esbuild, AMO reviewers may ask for a source package.
@@ -211,7 +221,7 @@ npm run source:zip
 The source package is generated at:
 
 ```text
-artifacts/private_url_blocker-0.1.0-source.zip
+artifacts/private_url_blocker-0.1.1-source.zip
 ```
 
 Build instructions for reviewers are in [SOURCE_BUILD.md](SOURCE_BUILD.md). AMO submission notes are in [AMO.md](AMO.md).
@@ -220,6 +230,7 @@ Build instructions for reviewers are in [SOURCE_BUILD.md](SOURCE_BUILD.md). AMO 
 
 ```text
 npm run build       Build dist/
+npm run metadata:check Check manifest/package metadata consistency
 npm run typecheck   Run TypeScript type checking
 npm run test        Build and run unit tests
 npm run amo:lint    Run web-ext lint against dist/
@@ -227,6 +238,10 @@ npm run xpi         Generate the extension package
 npm run source:zip  Generate the source package for AMO review
 npm run mobile      Run temporarily on Firefox Android stable
 ```
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md).
 
 ## Privacy
 

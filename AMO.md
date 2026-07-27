@@ -52,7 +52,7 @@ npm run source:zip
 Arquivo gerado:
 
 ```text
-artifacts/private_url_blocker-0.1.0-source.zip
+artifacts/private_url_blocker-0.1.1-source.zip
 ```
 
 Inclua o repositorio sem estas pastas:
@@ -68,6 +68,7 @@ Instrucoes para reviewers:
 
 ```powershell
 npm ci
+npm run metadata:check
 npm run typecheck
 npm run test
 npm run amo:lint

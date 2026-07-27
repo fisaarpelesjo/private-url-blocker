@@ -11,6 +11,7 @@ Run these commands from the repository root:
 
 ```powershell
 npm ci
+npm run metadata:check
 npm run typecheck
 npm run test
 npm run amo:lint
@@ -20,7 +21,7 @@ npm run xpi
 The generated extension package is:
 
 ```text
-artifacts/private_url_blocker-0.1.0.zip
+artifacts/private_url_blocker-0.1.1.zip
 ```
 
 ## Build process
@@ -29,6 +30,7 @@ artifacts/private_url_blocker-0.1.0.zip
 - Static extension files are in `public/`.
 - `scripts/build.mjs` copies static files from `public/` to `dist/`.
 - `scripts/build.mjs` bundles TypeScript entry points with `esbuild`.
+- `scripts/build-tests.mjs` bundles test entry points into `dist-tests/`.
 - `web-ext build` packages the generated `dist/` directory.
 
 ## Generated or external files
