@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { BlocklistStore } from "../src/storage/blocklist-store";
+import { BlocklistStore, importPayload } from "../src/storage/blocklist-store";
 
 const syncData = new Map<string, unknown>();
 let changedKeys: readonly string[] = [];
@@ -68,5 +68,14 @@ assert.equal((await store.getEntries()).length, 0);
 
 await store.restoreBackup();
 assert.equal((await store.getEntries()).length, 450);
+
+const importedFromStrings = importPayload(["https://www.instagram.com", "reddit.com/*"]);
+assert.equal(importedFromStrings[0]?.value, "instagram.com");
+assert.equal(importedFromStrings[1]?.value, "reddit.com/*");
+
+const importedFromObjects = importPayload({ version: 1, entries: [{ value: "https://m.facebook.com" }] });
+assert.equal(importedFromObjects[0]?.value, "facebook.com");
+
+assert.throws(() => importPayload({ entries: ["missing version"] }), /JSON invalido/u);
 
 export {};

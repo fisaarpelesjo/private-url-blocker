@@ -10,6 +10,7 @@ const BACKUP_META_KEY = "blocklistBackupMeta";
 const BACKUP_CHUNK_PREFIX = "blocklistBackupChunk:";
 const EMPTY_PAYLOAD: BlocklistPayload = { version: 1, entries: [] };
 const MAX_CHUNK_BYTES = 7_000;
+const SAFE_SYNC_PAYLOAD_BYTES = 90_000;
 
 export class BlocklistStore {
   async getEntries(): Promise<readonly BlockEntry[]> {
@@ -143,8 +144,7 @@ export function exportPayload(entries: readonly BlockEntry[]): BlocklistPayload 
 }
 
 export function importPayload(value: unknown): readonly BlockEntry[] {
-  const payload = parsePayload(value);
-  return normalizeImportedEntries(payload.entries);
+  return normalizeImportedEntries(parseImportEntries(value));
 }
 
 function parsePayload(value: unknown): BlocklistPayload {
@@ -212,6 +212,8 @@ async function setChunkedEntries(
   entries: readonly BlockEntry[],
   metadata: Record<string, unknown> = {}
 ): Promise<void> {
+  assertSyncPayloadSize(entries);
+
   const currentValues = await browser.storage.sync.get(metaKey);
   const currentMeta = parseChunkMeta(currentValues[metaKey]);
   const chunks = chunkEntries(entries);
@@ -254,6 +256,13 @@ function chunkEntries(entries: readonly BlockEntry[]): readonly (readonly BlockE
   }
 
   return chunks;
+}
+
+function assertSyncPayloadSize(entries: readonly BlockEntry[]): void {
+  const estimatedBytes = byteLength(JSON.stringify(entries));
+  if (estimatedBytes > SAFE_SYNC_PAYLOAD_BYTES) {
+    throw new Error("A lista excede o limite seguro do Firefox Sync. Exporte um backup e reduza a lista.");
+  }
 }
 
 function parseChunkMeta(value: unknown): ({ readonly version: 1; readonly chunkCount: number } & Record<string, unknown>) | null {
@@ -310,6 +319,44 @@ function normalizeImportedEntries(entries: readonly BlockEntry[]): readonly Bloc
   }
 
   return normalizedEntries.sort(compareEntries);
+}
+
+function parseImportEntries(value: unknown): readonly BlockEntry[] {
+  if (Array.isArray(value)) {
+    return value.map(parseImportEntry);
+  }
+
+  if (isRecord(value) && value.version === 1 && Array.isArray(value.entries)) {
+    return value.entries.map(parseImportEntry);
+  }
+
+  throw new Error("JSON invalido. Importe um array de dominios ou um backup exportado pela extensao.");
+}
+
+function parseImportEntry(value: unknown): BlockEntry {
+  if (typeof value === "string") {
+    return createImportedEntry(value);
+  }
+
+  if (isBlockEntry(value)) {
+    return value;
+  }
+
+  if (isRecord(value) && typeof value.value === "string") {
+    return createImportedEntry(value.value);
+  }
+
+  throw new Error("JSON invalido. Cada item precisa ser texto ou objeto com campo value.");
+}
+
+function createImportedEntry(value: string): BlockEntry {
+  const now = new Date().toISOString();
+  return {
+    id: createId(),
+    value,
+    createdAt: now,
+    updatedAt: now
+  };
 }
 
 function isBlockEntry(value: unknown): value is BlockEntry {
