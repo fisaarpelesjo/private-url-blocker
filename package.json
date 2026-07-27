@@ -12,6 +12,7 @@
     "mobile:beta": "node scripts/run-android.mjs beta",
     "mobile:nightly": "node scripts/run-android.mjs nightly",
     "amo:lint": "npm run build && web-ext lint --source-dir dist",
+    "source:zip": "node scripts/source-package.mjs",
     "xpi": "npm run build && web-ext build --source-dir dist --artifacts-dir artifacts --overwrite-dest",
     "typecheck": "tsc --noEmit",
     "test": "npm run build && node dist-tests/rules.test.mjs && node dist-tests/storage.test.mjs"

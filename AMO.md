@@ -43,6 +43,18 @@ npm run amo:lint
 
 Como o pacote final e gerado por `esbuild`, a Mozilla pode pedir o codigo-fonte junto com instrucoes de build.
 
+Gere o zip de codigo-fonte com:
+
+```powershell
+npm run source:zip
+```
+
+Arquivo gerado:
+
+```text
+artifacts/private_url_blocker-0.1.0-source.zip
+```
+
 Inclua o repositorio sem estas pastas:
 
 ```text
