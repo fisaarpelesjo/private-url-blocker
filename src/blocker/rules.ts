@@ -36,7 +36,7 @@ export function matchUrl(url: string, index: BlockIndex): MatchResult {
   }
 
   const host = normalizeHost(parsed.hostname);
-  const path = `${parsed.pathname || "/"}${parsed.search}${parsed.hash}`;
+  const path = `${parsed.pathname || "/"}${parsed.search}${parsed.hash}`.toLowerCase();
 
   if (index.exactDomains.has(host)) {
     return { blocked: true, rule: host };

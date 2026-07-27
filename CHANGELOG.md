@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Matched URL paths and query strings case-insensitively so one search URL rule blocks casing variants.
+
 ## 0.1.2
 
 - Preserved query strings in URL rules so specific search/result URLs can be blocked without blocking the whole domain.

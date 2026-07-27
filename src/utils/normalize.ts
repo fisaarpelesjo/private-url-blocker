@@ -3,12 +3,12 @@ import type { NormalizedRule } from "../types/blocklist";
 const STRIPPED_PREFIXES = ["www.", "m."];
 
 export function normalizeInput(rawInput: string): NormalizedRule {
-  const input = rawInput.trim().toLowerCase();
+  const input = rawInput.trim();
   if (input.length === 0) {
     throw new Error("Informe um dominio ou URL.");
   }
 
-  const withoutProtocol = input.replace(/^https?:\/\//u, "");
+  const withoutProtocol = input.replace(/^https?:\/\//iu, "");
   const wildcardHost = withoutProtocol.startsWith("*.");
   const parsed = parseRuleInput(withoutProtocol);
   const host = normalizeHost(parsed.host, wildcardHost);
@@ -17,7 +17,7 @@ export function normalizeInput(rawInput: string): NormalizedRule {
     throw new Error("Informe um dominio valido.");
   }
 
-  const path = normalizePath(parsed.path);
+  const path = normalizePath(parsed.path).toLowerCase();
   const hasWildcardPath = path.endsWith("/*");
   const shouldUsePath = path !== "" && path !== "/";
 
@@ -51,7 +51,7 @@ export function normalizeInput(rawInput: string): NormalizedRule {
 }
 
 export function normalizeHost(host: string, keepWildcardPrefix = false): string {
-  let normalized = host.replace(/\/+$/u, "").replace(/\.+$/u, "");
+  let normalized = host.replace(/\/+$/u, "").replace(/\.+$/u, "").toLowerCase();
 
   if (keepWildcardPrefix && normalized.startsWith("*.")) {
     normalized = normalized.slice(2);
