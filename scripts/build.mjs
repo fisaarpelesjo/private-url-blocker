@@ -20,7 +20,8 @@ await Promise.all([
   copyFile(join(root, "public", "popup.html"), join(dist, "popup.html")),
   copyFile(join(root, "public", "options.html"), join(dist, "options.html")),
   copyFile(join(root, "public", "blocked.html"), join(dist, "blocked.html")),
-  copyFile(join(root, "public", "styles.css"), join(dist, "styles.css"))
+  copyFile(join(root, "public", "styles.css"), join(dist, "styles.css")),
+  copyFile(join(root, "public", "icon.svg"), join(dist, "icon.svg"))
 ]);
 
 await build({

@@ -3,6 +3,11 @@
   "name": "Private URL Blocker",
   "version": "0.1.0",
   "description": "Bloqueia URLs e dominios definidos pelo usuario usando storage.sync.",
+  "icons": {
+    "48": "icon.svg",
+    "96": "icon.svg",
+    "128": "icon.svg"
+  },
   "browser_specific_settings": {
     "gecko": {
       "id": "private-url-blocker@local"
@@ -15,7 +20,8 @@
   },
   "action": {
     "default_title": "URL Blocker",
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": "icon.svg"
   },
   "options_ui": {
     "page": "options.html",

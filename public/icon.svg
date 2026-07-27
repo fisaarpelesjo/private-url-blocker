@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Private URL Blocker">
+  <defs>
+    <linearGradient id="shield" x1="24" x2="104" y1="12" y2="116" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1f7a5c"/>
+      <stop offset="1" stop-color="#143c5a"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#shield)" d="M64 8 20 24v35c0 29 17 51 44 61 27-10 44-32 44-61V24L64 8Z"/>
+  <path fill="#ffffff" d="M64 24c-22 0-40 18-40 40s18 40 40 40 40-18 40-40-18-40-40-40Zm0 12c6 0 12 2 17 6L42 81a28 28 0 0 1 22-45Zm0 56c-6 0-12-2-17-6l39-39a28 28 0 0 1-22 45Z"/>
+  <path fill="#b42318" d="M47 86 86 47a28 28 0 0 0-5-5L42 81a28 28 0 0 0 5 5Z"/>
+</svg>
