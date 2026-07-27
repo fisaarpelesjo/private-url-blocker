@@ -11,7 +11,7 @@
   "permissions": ["storage", "webRequest", "webRequestBlocking"],
   "host_permissions": ["<all_urls>"],
   "background": {
-    "service_worker": "background/service-worker.js"
+    "scripts": ["background/service-worker.js"]
   },
   "action": {
     "default_title": "URL Blocker",
