@@ -8,7 +8,7 @@
       "id": "private-url-blocker@local"
     }
   },
-  "permissions": ["storage", "webRequest", "webRequestBlocking"],
+  "permissions": ["storage", "tabs", "webRequest", "webRequestBlocking"],
   "host_permissions": ["<all_urls>"],
   "background": {
     "scripts": ["background/service-worker.js"]

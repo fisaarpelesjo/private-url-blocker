@@ -43,6 +43,17 @@ declare namespace Browser {
     };
   }
 
+  interface Tab {
+    readonly id?: number;
+    readonly active?: boolean;
+    readonly currentWindow?: boolean;
+    readonly url?: string;
+  }
+
+  interface Tabs {
+    query(queryInfo: { active?: boolean; currentWindow?: boolean }): Promise<Tab[]>;
+  }
+
   interface Downloads {
     download(options: { url: string; filename: string; saveAs?: boolean }): Promise<number>;
   }
@@ -51,6 +62,7 @@ declare namespace Browser {
 declare const browser: {
   runtime: Browser.Runtime;
   storage: Browser.Storage;
+  tabs: Browser.Tabs;
   webRequest: Browser.WebRequest;
   downloads?: Browser.Downloads;
 };

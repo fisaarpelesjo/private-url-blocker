@@ -112,6 +112,36 @@ p {
   gap: 8px;
 }
 
+.current-site {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.current-site span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.current-site strong {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.current-site button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .toolbar {
   display: flex;
   flex-wrap: wrap;
