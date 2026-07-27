@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Private URL Blocker",
+  "version": "0.1.0",
+  "description": "Bloqueia URLs e dominios definidos pelo usuario usando storage.sync.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "private-url-blocker@local"
+    }
+  },
+  "permissions": ["storage", "webRequest", "webRequestBlocking"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "action": {
+    "default_title": "URL Blocker",
+    "default_popup": "popup.html"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["blocked.html", "styles.css"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

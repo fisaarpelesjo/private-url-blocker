@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Opcoes - URL Blocker</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app-panel wide">
+      <header class="topbar">
+        <div>
+          <h1>Opcoes</h1>
+          <p><span id="item-count">0</span> itens sincronizados</p>
+        </div>
+        <button id="export-button" type="button">Exportar JSON</button>
+      </header>
+
+      <section class="toolbar">
+        <button id="import-button" type="button">Importar JSON</button>
+        <button id="backup-button" type="button">Criar backup</button>
+        <button id="restore-button" type="button">Restaurar backup</button>
+        <button id="clear-button" type="button" class="danger">Limpar lista</button>
+        <input id="file-input" type="file" accept="application/json,.json" hidden>
+      </section>
+
+      <form id="add-form" class="entry-form">
+        <label for="block-input">Adicionar dominio ou URL</label>
+        <div class="input-row">
+          <input id="block-input" type="text" autocomplete="off" placeholder="*.youtube.com">
+          <button type="submit">Adicionar</button>
+        </div>
+      </form>
+
+      <label for="search-input">Pesquisar na lista</label>
+      <input id="search-input" type="search" autocomplete="off" placeholder="reddit">
+
+      <div id="message" class="message" role="status"></div>
+      <ul id="block-list" class="rule-list spacious"></ul>
+    </main>
+    <script src="options/options.js"></script>
+  </body>
+</html>

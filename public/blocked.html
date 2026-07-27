@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Site bloqueado</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="blocked-shell">
+    <main class="blocked-panel">
+      <div class="blocked-symbol" aria-hidden="true">!</div>
+      <h1>Este site esta bloqueado</h1>
+      <p>Dominio:</p>
+      <strong id="blocked-rule">desconhecido</strong>
+    </main>
+    <script>
+      const params = new URLSearchParams(location.search);
+      document.getElementById("blocked-rule").textContent = params.get("rule") || "desconhecido";
+    </script>
+  </body>
+</html>
