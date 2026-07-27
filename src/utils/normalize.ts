@@ -19,7 +19,7 @@ export function normalizeInput(rawInput: string): NormalizedRule {
 
   const path = normalizePath(parsed.path);
   const hasWildcardPath = path.endsWith("/*");
-  const shouldUsePath = path !== "" && path !== "/" && !parsed.hadQueryOrHash;
+  const shouldUsePath = path !== "" && path !== "/";
 
   if (wildcardHost && shouldUsePath) {
     throw new Error("Wildcard de subdominio nao pode ser combinado com caminho.");
@@ -69,16 +69,18 @@ export function normalizeHost(host: string, keepWildcardPrefix = false): string 
 function parseRuleInput(input: string): { readonly host: string; readonly path: string; readonly hadQueryOrHash: boolean } {
   const queryIndex = input.search(/[?#]/u);
   const hadQueryOrHash = queryIndex >= 0;
-  const beforeQuery = hadQueryOrHash ? input.slice(0, queryIndex) : input;
-  const slashIndex = beforeQuery.indexOf("/");
+  const slashIndex = input.indexOf("/");
+  const hostEndCandidates = [slashIndex, queryIndex].filter((index) => index >= 0);
+  const hostEnd = hostEndCandidates.length > 0 ? Math.min(...hostEndCandidates) : input.length;
+  const path = input.slice(hostEnd);
 
-  if (slashIndex < 0) {
-    return { host: beforeQuery, path: "", hadQueryOrHash };
+  if (path.length === 0) {
+    return { host: input, path: "", hadQueryOrHash };
   }
 
   return {
-    host: beforeQuery.slice(0, slashIndex),
-    path: beforeQuery.slice(slashIndex),
+    host: input.slice(0, hostEnd),
+    path: path.startsWith("/") ? path : `/${path}`,
     hadQueryOrHash
   };
 }
@@ -88,6 +90,10 @@ function normalizePath(path: string): string {
     return "";
   }
 
-  const squashed = path.replace(/\/{2,}/gu, "/");
-  return squashed.startsWith("/") ? squashed : `/${squashed}`;
+  const queryIndex = path.search(/[?#]/u);
+  const pathPart = queryIndex >= 0 ? path.slice(0, queryIndex) : path;
+  const suffix = queryIndex >= 0 ? path.slice(queryIndex) : "";
+  const squashed = pathPart.replace(/\/{2,}/gu, "/");
+  const normalizedPath = squashed.startsWith("/") ? squashed : `/${squashed}`;
+  return `${normalizedPath}${suffix}`;
 }

@@ -21,7 +21,7 @@ npm run xpi
 The generated extension package is:
 
 ```text
-artifacts/private_url_blocker-0.1.1.zip
+artifacts/private_url_blocker-0.1.2.zip
 ```
 
 ## Build process

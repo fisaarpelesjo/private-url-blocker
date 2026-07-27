@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+- Preserved query strings in URL rules so specific search/result URLs can be blocked without blocking the whole domain.
+
 ## 0.1.1
 
 - Reduced privileged tab access by replacing `tabs` with `activeTab`.

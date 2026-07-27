@@ -27,6 +27,7 @@ facebook.com
 instagram.com
 reddit.com
 youtube.com/shorts
+google.com/search?q=example-query
 x.com/*
 *.google.com
 *.facebook.com
@@ -37,7 +38,7 @@ Input is normalized automatically:
 
 ```text
 https://www.instagram.com -> instagram.com
-https://youtube.com/watch?v=123 -> youtube.com
+https://youtube.com/watch?v=123 -> youtube.com/watch?v=123
 https://m.facebook.com -> facebook.com
 ```
 
@@ -47,7 +48,8 @@ The normalizer removes:
 - `https://`
 - `www.`
 - `m.`
-- query strings when the rule should be treated as a domain rule
+
+URL rules with a path or query string block only matching URLs, not the full domain. For example, `google.com/search?q=example-query` blocks that Google search URL while leaving `google.com` unblocked.
 
 ## Project Structure
 
@@ -207,7 +209,7 @@ npm run xpi
 The package is generated at:
 
 ```text
-artifacts/private_url_blocker-0.1.1.zip
+artifacts/private_url_blocker-0.1.2.zip
 ```
 
 Because this project uses TypeScript and esbuild, AMO reviewers may ask for a source package.
@@ -221,7 +223,7 @@ npm run source:zip
 The source package is generated at:
 
 ```text
-artifacts/private_url_blocker-0.1.1-source.zip
+artifacts/private_url_blocker-0.1.2-source.zip
 ```
 
 Build instructions for reviewers are in [SOURCE_BUILD.md](SOURCE_BUILD.md). AMO submission notes are in [AMO.md](AMO.md).
