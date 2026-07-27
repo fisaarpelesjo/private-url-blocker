@@ -23,7 +23,7 @@
     "scripts": ["background/service-worker.js"]
   },
   "action": {
-    "default_title": "URL Blocker",
+    "default_title": "Private URL Blocker",
     "default_popup": "popup.html",
     "default_icon": "icon.svg"
   },
