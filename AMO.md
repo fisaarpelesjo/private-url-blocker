@@ -39,6 +39,36 @@ npm run amo:lint
 4. Envie o `.xpi` gerado em `artifacts/`.
 5. Baixe o `.xpi` assinado quando a validação terminar.
 
+## Source package para revisao
+
+Como o pacote final e gerado por `esbuild`, a Mozilla pode pedir o codigo-fonte junto com instrucoes de build.
+
+Inclua o repositorio sem estas pastas:
+
+```text
+node_modules/
+dist/
+dist-tests/
+artifacts/
+```
+
+Instrucoes para reviewers:
+
+```powershell
+npm ci
+npm run typecheck
+npm run test
+npm run amo:lint
+npm run xpi
+```
+
+Ambiente usado:
+
+```text
+Node >= 22
+npm via package-lock.json
+```
+
 ## Instalar no Firefox Android
 
 O caminho mais simples no Android e instalar pela pagina do AMO quando a extensao estiver listada e marcada como compativel com Android.

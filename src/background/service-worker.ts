@@ -24,8 +24,7 @@ browser.webRequest.onBeforeRequest.addListener(
       return {};
     }
 
-    const blockedPage = browser.runtime.getURL(`blocked.html?rule=${encodeURIComponent(result.rule ?? "desconhecido")}`);
-    return { redirectUrl: blockedPage };
+    return { redirectUrl: browser.runtime.getURL("blocked.html") };
   },
   { urls: ["<all_urls>"] },
   ["blocking"]

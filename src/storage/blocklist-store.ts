@@ -4,7 +4,12 @@ import { normalizeInput } from "../utils/normalize";
 
 const BLOCKLIST_KEY = "blocklist";
 const BACKUP_KEY = "blocklistBackup";
+const BLOCKLIST_META_KEY = "blocklistMeta";
+const BLOCKLIST_CHUNK_PREFIX = "blocklistChunk:";
+const BACKUP_META_KEY = "blocklistBackupMeta";
+const BACKUP_CHUNK_PREFIX = "blocklistBackupChunk:";
 const EMPTY_PAYLOAD: BlocklistPayload = { version: 1, entries: [] };
+const MAX_CHUNK_BYTES = 7_000;
 
 export class BlocklistStore {
   async getEntries(): Promise<readonly BlockEntry[]> {
@@ -77,13 +82,12 @@ export class BlocklistStore {
       createdAt: new Date().toISOString(),
       entries
     };
-    await browser.storage.sync.set({ [BACKUP_KEY]: backup });
+    await setChunkedEntries(BACKUP_META_KEY, BACKUP_CHUNK_PREFIX, entries, { createdAt: backup.createdAt });
     return backup;
   }
 
   async restoreBackup(): Promise<readonly BlockEntry[]> {
-    const values = await browser.storage.sync.get(BACKUP_KEY);
-    const backup = parseBackup(values[BACKUP_KEY]);
+    const backup = await this.getBackup();
 
     if (backup === null) {
       throw new Error("Nenhum backup encontrado.");
@@ -95,23 +99,39 @@ export class BlocklistStore {
 
   onChanged(callback: () => void): void {
     browser.storage.onChanged.addListener((changes, areaName) => {
-      if (areaName === "sync" && BLOCKLIST_KEY in changes) {
+      const changedKeys = Object.keys(changes);
+      const blocklistChanged = changedKeys.some(
+        (key) => key === BLOCKLIST_KEY || key === BLOCKLIST_META_KEY || key.startsWith(BLOCKLIST_CHUNK_PREFIX)
+      );
+
+      if (areaName === "sync" && blocklistChanged) {
         callback();
       }
     });
   }
 
   private async getPayload(): Promise<BlocklistPayload> {
+    const chunkedPayload = await getChunkedPayload(BLOCKLIST_META_KEY, BLOCKLIST_CHUNK_PREFIX);
+    if (chunkedPayload !== null) {
+      return chunkedPayload;
+    }
+
     const values = await browser.storage.sync.get(BLOCKLIST_KEY);
     return parsePayload(values[BLOCKLIST_KEY]);
   }
 
   private async setEntries(entries: readonly BlockEntry[]): Promise<void> {
-    const payload: BlocklistPayload = {
-      version: 1,
-      entries
-    };
-    await browser.storage.sync.set({ [BLOCKLIST_KEY]: payload });
+    await setChunkedEntries(BLOCKLIST_META_KEY, BLOCKLIST_CHUNK_PREFIX, entries);
+  }
+
+  private async getBackup(): Promise<BlocklistBackup | null> {
+    const chunkedBackup = await getChunkedBackup(BACKUP_META_KEY, BACKUP_CHUNK_PREFIX);
+    if (chunkedBackup !== null) {
+      return chunkedBackup;
+    }
+
+    const values = await browser.storage.sync.get(BACKUP_KEY);
+    return parseBackup(values[BACKUP_KEY]);
   }
 }
 
@@ -146,6 +166,130 @@ function parseBackup(value: unknown): BlocklistBackup | null {
     createdAt: value.createdAt,
     entries: value.entries.filter(isBlockEntry).sort(compareEntries)
   };
+}
+
+async function getChunkedPayload(metaKey: string, chunkPrefix: string): Promise<BlocklistPayload | null> {
+  const values = await browser.storage.sync.get(metaKey);
+  const meta = parseChunkMeta(values[metaKey]);
+
+  if (meta === null) {
+    return null;
+  }
+
+  const chunkKeys = createChunkKeys(chunkPrefix, meta.chunkCount);
+  const chunkValues = await browser.storage.sync.get([...chunkKeys]);
+  const entries = chunkKeys.flatMap((key) => parseChunk(chunkValues[key]));
+
+  return {
+    version: 1,
+    entries: entries.sort(compareEntries)
+  };
+}
+
+async function getChunkedBackup(metaKey: string, chunkPrefix: string): Promise<BlocklistBackup | null> {
+  const values = await browser.storage.sync.get(metaKey);
+  const meta = parseChunkMeta(values[metaKey]);
+
+  if (meta === null || typeof meta.createdAt !== "string") {
+    return null;
+  }
+
+  const payload = await getChunkedPayload(metaKey, chunkPrefix);
+  if (payload === null) {
+    return null;
+  }
+
+  return {
+    version: 1,
+    createdAt: meta.createdAt,
+    entries: payload.entries
+  };
+}
+
+async function setChunkedEntries(
+  metaKey: string,
+  chunkPrefix: string,
+  entries: readonly BlockEntry[],
+  metadata: Record<string, unknown> = {}
+): Promise<void> {
+  const currentValues = await browser.storage.sync.get(metaKey);
+  const currentMeta = parseChunkMeta(currentValues[metaKey]);
+  const chunks = chunkEntries(entries);
+  const items: Record<string, unknown> = {
+    [metaKey]: {
+      version: 1,
+      chunkCount: chunks.length,
+      updatedAt: new Date().toISOString(),
+      ...metadata
+    }
+  };
+
+  chunks.forEach((chunk, index) => {
+    items[`${chunkPrefix}${index}`] = chunk;
+  });
+
+  await browser.storage.sync.set(items);
+
+  const staleKeys = createStaleChunkKeys(chunkPrefix, chunks.length, currentMeta?.chunkCount ?? 0);
+  await browser.storage.sync.remove([BLOCKLIST_KEY, BACKUP_KEY, ...staleKeys]);
+}
+
+function chunkEntries(entries: readonly BlockEntry[]): readonly (readonly BlockEntry[])[] {
+  const chunks: BlockEntry[][] = [];
+  let currentChunk: BlockEntry[] = [];
+
+  for (const entry of entries) {
+    const candidate = [...currentChunk, entry];
+    if (currentChunk.length > 0 && byteLength(JSON.stringify(candidate)) > MAX_CHUNK_BYTES) {
+      chunks.push(currentChunk);
+      currentChunk = [entry];
+      continue;
+    }
+
+    currentChunk = candidate;
+  }
+
+  if (currentChunk.length > 0) {
+    chunks.push(currentChunk);
+  }
+
+  return chunks;
+}
+
+function parseChunkMeta(value: unknown): ({ readonly version: 1; readonly chunkCount: number } & Record<string, unknown>) | null {
+  if (!isRecord(value) || value.version !== 1 || typeof value.chunkCount !== "number" || !Number.isInteger(value.chunkCount)) {
+    return null;
+  }
+
+  return {
+    ...value,
+    version: 1,
+    chunkCount: value.chunkCount
+  };
+}
+
+function parseChunk(value: unknown): readonly BlockEntry[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.filter(isBlockEntry);
+}
+
+function createChunkKeys(prefix: string, chunkCount: number): readonly string[] {
+  return Array.from({ length: chunkCount }, (_, index) => `${prefix}${index}`);
+}
+
+function createStaleChunkKeys(prefix: string, nextCount: number, previousCount: number): readonly string[] {
+  if (previousCount <= nextCount) {
+    return [];
+  }
+
+  return Array.from({ length: previousCount - nextCount }, (_, index) => `${prefix}${nextCount + index}`);
+}
+
+function byteLength(value: string): number {
+  return new Blob([value]).size;
 }
 
 function normalizeImportedEntries(entries: readonly BlockEntry[]): readonly BlockEntry[] {

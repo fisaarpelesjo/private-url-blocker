@@ -41,10 +41,11 @@ await build({
 });
 
 await build({
-  entryPoints: [join(root, "tests", "rules.test.ts")],
+  entryPoints: [join(root, "tests", "rules.test.ts"), join(root, "tests", "storage.test.ts")],
   bundle: true,
   format: "esm",
-  outfile: join(testDist, "rules.test.mjs"),
+  outdir: testDist,
+  outExtension: { ".js": ".mjs" },
   platform: "node",
   target: ["node20"],
   logLevel: "info"

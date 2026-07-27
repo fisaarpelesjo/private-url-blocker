@@ -14,7 +14,7 @@
     "amo:lint": "npm run build && web-ext lint --source-dir dist",
     "xpi": "npm run build && web-ext build --source-dir dist --artifacts-dir artifacts --overwrite-dest",
     "typecheck": "tsc --noEmit",
-    "test": "npm run build && node dist-tests/rules.test.mjs"
+    "test": "npm run build && node dist-tests/rules.test.mjs && node dist-tests/storage.test.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.1.2",

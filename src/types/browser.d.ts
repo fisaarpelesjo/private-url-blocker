@@ -53,10 +53,6 @@ declare namespace Browser {
   interface Tabs {
     query(queryInfo: { active?: boolean; currentWindow?: boolean }): Promise<Tab[]>;
   }
-
-  interface Downloads {
-    download(options: { url: string; filename: string; saveAs?: boolean }): Promise<number>;
-  }
 }
 
 declare const browser: {
@@ -64,5 +60,4 @@ declare const browser: {
   storage: Browser.Storage;
   tabs: Browser.Tabs;
   webRequest: Browser.WebRequest;
-  downloads?: Browser.Downloads;
 };
