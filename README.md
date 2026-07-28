@@ -28,6 +28,7 @@ instagram.com
 reddit.com
 youtube.com/shorts
 google.com/search?q=example-query
+keyword:blockedterm
 x.com/*
 *.google.com
 *.facebook.com
@@ -53,6 +54,8 @@ The normalizer removes:
 URL rules with a path or query string block only matching URLs, not the full domain. For example, `google.com/search?q=example-query` blocks that Google search URL while leaving `google.com` unblocked.
 
 Domains, URL paths, and query strings are matched case-insensitively, so `google.com/search?q=%40examplequery` also blocks `google.com/search?q=%40ExampleQuery`.
+
+Search keyword rules use `keyword:term` and block search URLs when that term appears inside query parameters such as `q` or `search_query`.
 
 ## Project Structure
 
@@ -212,7 +215,7 @@ npm run xpi
 The package is generated at:
 
 ```text
-artifacts/private_url_blocker-0.1.3.zip
+artifacts/private_url_blocker-0.1.4.zip
 ```
 
 Because this project uses TypeScript and esbuild, AMO reviewers may ask for a source package.
@@ -226,7 +229,7 @@ npm run source:zip
 The source package is generated at:
 
 ```text
-artifacts/private_url_blocker-0.1.3-source.zip
+artifacts/private_url_blocker-0.1.4-source.zip
 ```
 
 Build instructions for reviewers are in [SOURCE_BUILD.md](SOURCE_BUILD.md). AMO submission notes are in [AMO.md](AMO.md).

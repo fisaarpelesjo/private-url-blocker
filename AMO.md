@@ -52,7 +52,7 @@ npm run source:zip
 Arquivo gerado:
 
 ```text
-artifacts/private_url_blocker-0.1.3-source.zip
+artifacts/private_url_blocker-0.1.4-source.zip
 ```
 
 Inclua o repositorio sem estas pastas:

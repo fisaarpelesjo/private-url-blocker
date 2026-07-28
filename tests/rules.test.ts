@@ -10,6 +10,7 @@ assert.equal(normalizeInput("https://www.google.com/search?q=%40examplequery").v
 assert.equal(normalizeInput("https://m.facebook.com").value, "facebook.com");
 assert.equal(normalizeInput("*.google.com").value, "*.google.com");
 assert.equal(normalizeInput("reddit.com/*").value, "reddit.com/*");
+assert.equal(normalizeInput("keyword:BlockedTerm").value, "keyword:blockedterm");
 assert.equal(normalizeInput("https://www.youtube.com/shorts").value, "youtube.com/shorts");
 assert.equal(
   normalizeInput("https://www.google.com/search?client=firefox-b-d&q=example-query").value,
@@ -22,7 +23,9 @@ const entries: readonly BlockEntry[] = [
   entry("reddit.com/*"),
   entry("youtube.com/shorts"),
   entry("google.com/search?client=firefox-b-d&q=example-query"),
-  entry("google.com/search?q=%40ExampleQuery")
+  entry("google.com/search?q=%40ExampleQuery"),
+  entry("keyword:blockedterm"),
+  entry("keyword:sample phrase")
 ];
 const index = createBlockIndex(entries);
 
@@ -37,6 +40,10 @@ assert.equal(matchUrl("https://www.google.com/search?client=firefox-b-d&q=exampl
 assert.equal(matchUrl("https://www.google.com/search?client=firefox-b-d&q=outra", index).blocked, false);
 assert.equal(matchUrl("https://www.google.com/search?q=%40ExampleQuery", index).blocked, true);
 assert.equal(matchUrl("https://www.google.com/search?q=%40examplequery", index).blocked, true);
+assert.equal(matchUrl("https://www.google.com/search?q=prefix+blockedterm&client=firefox-b-d&udm=2", index).blocked, true);
+assert.equal(matchUrl("https://www.google.com/search?q=prefix+allowedterm&client=firefox-b-d", index).blocked, false);
+assert.equal(matchUrl("https://www.google.com/search?q=sample+phrase&client=firefox-b-d", index).blocked, true);
+assert.equal(matchUrl("https://www.youtube.com/results?search_query=prefix+blockedterm", index).blocked, true);
 assert.equal(matchUrl("moz-extension://abc/blocked.html", index).blocked, false);
 
 function entry(value: string): BlockEntry {

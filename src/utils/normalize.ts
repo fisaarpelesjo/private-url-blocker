@@ -8,6 +8,11 @@ export function normalizeInput(rawInput: string): NormalizedRule {
     throw new Error("Informe um dominio ou URL.");
   }
 
+  const keywordRule = normalizeKeywordRule(input);
+  if (keywordRule !== null) {
+    return keywordRule;
+  }
+
   const withoutProtocol = input.replace(/^https?:\/\//iu, "");
   const wildcardHost = withoutProtocol.startsWith("*.");
   const parsed = parseRuleInput(withoutProtocol);
@@ -47,6 +52,25 @@ export function normalizeInput(rawInput: string): NormalizedRule {
     value: host,
     kind: "domain",
     host
+  };
+}
+
+function normalizeKeywordRule(input: string): NormalizedRule | null {
+  const match = /^(?:keyword|palavra|termo):(.+)$/iu.exec(input);
+  if (match === null) {
+    return null;
+  }
+
+  const keyword = normalizeKeyword(match[1] ?? "");
+  if (keyword.length === 0) {
+    throw new Error("Informe uma palavra-chave valida.");
+  }
+
+  return {
+    value: `keyword:${keyword}`,
+    kind: "search-keyword",
+    host: "",
+    pathPrefix: keyword
   };
 }
 
@@ -96,4 +120,8 @@ function normalizePath(path: string): string {
   const squashed = pathPart.replace(/\/{2,}/gu, "/");
   const normalizedPath = squashed.startsWith("/") ? squashed : `/${squashed}`;
   return `${normalizedPath}${suffix}`;
+}
+
+function normalizeKeyword(keyword: string): string {
+  return keyword.trim().replace(/\s+/gu, " ").toLowerCase();
 }

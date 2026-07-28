@@ -21,7 +21,7 @@ export interface MatchResult {
   readonly rule?: string;
 }
 
-export type NormalizedRuleKind = "domain" | "wildcard-domain" | "url-prefix" | "url-wildcard";
+export type NormalizedRuleKind = "domain" | "wildcard-domain" | "url-prefix" | "url-wildcard" | "search-keyword";
 
 export interface NormalizedRule {
   readonly value: string;
